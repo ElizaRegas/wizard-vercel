@@ -1,0 +1,14 @@
+---
+description: Hero carousel row positions — do not modify
+globs: components/HeroImageBand.tsx
+alwaysApply: false
+---
+
+# Hero Carousel Row Positions (Fixed)
+
+Do **not** change the `top` position of the scrolling rows in `HeroImageBand.tsx`. These values are final:
+
+- **Top row**: `top: calc(50% - 325px)`
+- **Bottom row**: `top: calc(50% + 196px)`
+
+Keep these rows exactly here, regardless of other change requests. If a request would require moving the rows, decline or suggest an alternative that does not alter these positions.

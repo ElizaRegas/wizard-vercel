@@ -108,11 +108,99 @@ main {
   position: relative;
 }
 
-/* Glass panel — sits above cinematic bloom, soft center for readability */
+/* Glass panel — sits above cinematic bloom */
 .hero-glass-panel {
   position: relative;
   z-index: 2;
-  background: rgba(32, 44, 64, 0.58);
+}
+
+/* Stronger glass gradient — dimensional light + inner edge */
+.hero-glass {
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(255,255,255,0.22);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.18) 0%,
+      rgba(255,255,255,0.10) 35%,
+      rgba(255,255,255,0.06) 60%,
+      rgba(255,255,255,0.04) 100%
+    ),
+    rgba(255,255,255,0.04);
+  backdrop-filter: blur(26px) saturate(160%) brightness(1.05);
+  -webkit-backdrop-filter: blur(26px) saturate(160%) brightness(1.05);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 0 80px -20px rgba(255,255,255,0.22),
+    inset 0 0 40px -15px rgba(255,255,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.42),
+    0 100px 280px rgba(0,0,0,0.5),
+    0 56px 120px rgba(0,0,0,0.45),
+    0 24px 48px rgba(0,0,0,0.38);
+  mask-image: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,1) 60%,
+    rgba(0,0,0,0.85) 75%,
+    rgba(0,0,0,0.7) 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,1) 60%,
+    rgba(0,0,0,0.85) 75%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+
+/* Top-surface lighting — no halo, light from top edge */
+.hero-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.24) 0%,
+    rgba(255,255,255,0.14) 18%,
+    rgba(255,255,255,0.06) 45%,
+    rgba(255,255,255,0.02) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Bottom 30px — stronger blur + brightness strip */
+.hero-glass-bottom-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  border-radius: 0 0 24px 24px;
+  pointer-events: none;
+  backdrop-filter: blur(56px) brightness(1.25);
+  -webkit-backdrop-filter: blur(56px) brightness(1.25);
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.16) 100%
+  );
+}
+
+/* Bottom depth gradient — denser at lower edge */
+.hero-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 65%,
+    rgba(0,0,0,0.12) 88%,
+    rgba(0,0,0,0.18) 100%
+  );
 }
 
 /* Hero panel — subtle cool top highlight */
@@ -162,6 +250,26 @@ main {
     rgba(0, 0, 0, 0) 72%
   );
   filter: blur(80px);
+}
+
+/* Bottom fade — localized dark behind panel overlap zone only */
+.hero-panel-wrapper::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -28px;
+  height: 110px;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0,0,0,0.00) 0%,
+    rgba(0,0,0,0.14) 45%,
+    rgba(0,0,0,0.30) 75%,
+    rgba(0,0,0,0.42) 100%
+  );
+  filter: blur(18px);
 }
 
 /* Primary CTA — wine-red gradient */
@@ -291,27 +399,25 @@ main {
   margin-bottom: 2rem;
 }
 
-/* Hero descriptor — above logo */
+/* Hero descriptor — glass pill, soft border blends into panel */
 .hero-descriptor {
   position: relative;
   z-index: 3;
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
   font-size: 0.95rem;
   letter-spacing: 0.18em;
   color: rgba(255,255,255,0.68);
   text-shadow: 0 1px 6px rgba(0,0,0,0.35);
-}
-
-.hero-descriptor::before {
-  content: "";
-  position: absolute;
-  inset: -12px -40px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(5, 10, 18, 0.55),
-    rgba(5, 10, 18, 0)
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.14),
+    rgba(255,255,255,0.04)
   );
-  z-index: -1;
-  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 
 nextjs-portal {
@@ -327,30 +433,30 @@ nextjs-portal {
     0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-/* Top row — farther away (scale, blur, opacity, lighter shadow) */
+/* Top row — closer (scale, less blur, opacity, stronger shadow) */
 .scrolling-row-top {
-  transform: translateY(10px);
+  transform: scale(1.02);
   transform-origin: center;
 }
 
 .scrolling-row-top .thumbnail {
+  opacity: 0.92;
+  filter: blur(1px) brightness(1.02);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Bottom row — farther away (scale, blur, opacity, lighter shadow) */
+.scrolling-row-bottom {
+  transform: none;
+  transform-origin: center;
+}
+
+.scrolling-row-bottom .thumbnail {
   opacity: 0.68;
   filter: blur(1px) brightness(0.88);
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.28),
     0 0 0 1px rgba(255, 255, 255, 0.03);
-}
-
-/* Bottom row — closer (scale, less blur, opacity, stronger shadow) */
-.scrolling-row-bottom {
-  transform: scale(1.02);
-  transform-origin: center;
-}
-
-.scrolling-row-bottom .thumbnail {
-  opacity: 0.92;
-  filter: blur(1px) brightness(0.98);
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
 }

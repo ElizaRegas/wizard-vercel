@@ -12,11 +12,11 @@ import { PORTFOLIO_IMAGES } from "@/portfolioImages";
 export default function HeroImageBand() {
   return (
     <>
-      {/* Top row — 40px below panel top edge, slightly more faded */}
+      {/* Top row — bottom 40px overlaps panel */}
       <div
-        className="scrolling-row scrolling-row-top absolute left-0 right-0 z-[1] h-[140px] overflow-hidden"
+        className="scrolling-row scrolling-row-top absolute left-0 right-0 z-[1] h-auto overflow-hidden"
         style={{
-          top: "calc(50% - 310px)",
+          top: "calc(50% - 325px)",
           maskImage:
             "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
           WebkitMaskImage:
@@ -31,11 +31,11 @@ export default function HeroImageBand() {
         />
       </div>
 
-      {/* Bottom row — grazes panel bottom, more present */}
+      {/* Bottom row — top 40px overlaps panel */}
       <div
-        className="scrolling-row scrolling-row-bottom absolute left-0 right-0 z-[1] h-[140px] overflow-hidden"
+        className="scrolling-row scrolling-row-bottom absolute left-0 right-0 z-[1] h-auto overflow-hidden"
         style={{
-          top: "calc(50% + 170px)",
+          top: "calc(50% + 196px)",
           maskImage:
             "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
           WebkitMaskImage:

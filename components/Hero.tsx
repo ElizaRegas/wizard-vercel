@@ -39,18 +39,13 @@ export default function Hero() {
         <div className="hero-content relative z-10 w-full py-8 md:py-10">
           {/* Logo panel — sits above scrolling rows */}
           <div
-            className="hero-panel hero-glass-panel w-full max-w-[900px] overflow-hidden"
+            className="hero-panel hero-glass-panel hero-glass w-full max-w-[900px] overflow-hidden"
             style={{
-              border: "1px solid rgba(255,255,255,0.25)",
-              borderRadius: 32,
-              backdropFilter: "blur(14px) saturate(125%)",
-              WebkitBackdropFilter: "blur(14px) saturate(125%)",
-              boxShadow:
-                "0 90px 220px rgba(0,0,0,0.55), 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(255,255,255,0.06)",
               padding: "64px 80px",
-              maxHeight: 420,
             }}
           >
+          {/* Bottom 30px — extra blur + brightness */}
+          <div className="hero-glass-bottom-strip" aria-hidden />
           <div className="relative flex flex-col items-center text-center">
             <p className="hero-descriptor mb-4 font-medium uppercase">
               Design • Development • Performance
@@ -79,13 +74,13 @@ export default function Hero() {
             <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
               <a
                 href="#projects"
-                className="cta-primary hero-cta-btn flex min-h-[48px] min-w-[160px] items-center justify-center rounded-lg px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
+                className="cta-primary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-lg px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
               >
                 View Work
               </a>
               <a
                 href="#contact"
-                className="cta-secondary hero-cta-btn flex min-h-[48px] min-w-[160px] items-center justify-center rounded-lg px-8 py-3.5 text-sm font-medium uppercase transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
+                className="cta-secondary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-lg px-8 py-3.5 text-sm font-medium uppercase transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
               >
                 Start Project
               </a>
