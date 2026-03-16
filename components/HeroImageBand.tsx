@@ -16,7 +16,7 @@ export default function HeroImageBand() {
       <div
         className="scrolling-row scrolling-row-top absolute left-0 right-0 z-[1] h-auto overflow-hidden"
         style={{
-          top: "calc(50% - 325px)",
+          top: "calc(50% - 350px)",
           maskImage:
             "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
           WebkitMaskImage:
@@ -35,7 +35,7 @@ export default function HeroImageBand() {
       <div
         className="scrolling-row scrolling-row-bottom absolute left-0 right-0 z-[1] h-auto overflow-hidden"
         style={{
-          top: "calc(50% + 196px)",
+          top: "calc(50% + 221px)",
           maskImage:
             "linear-gradient(to right, transparent, black 18%, black 82%, transparent)",
           WebkitMaskImage:
