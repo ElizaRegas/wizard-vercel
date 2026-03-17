@@ -7,6 +7,7 @@ export default function Home() {
             <Hero />
             <div className="section-divider-glass" aria-hidden />
             <About />
+            <div className="section-divider-glass" aria-hidden />
             <section id="projects">
                 <h2>Featured Projects</h2>
                 <p>Selected work will go here.</p>
@@ -16,6 +17,8 @@ export default function Home() {
                 <h2>Services</h2>
                 <p>Design, development, and creative technology.</p>
             </section>
+
+            <div className="section-divider-glass" aria-hidden />
 
             <section id="contact">
                 <h2>Contact</h2>

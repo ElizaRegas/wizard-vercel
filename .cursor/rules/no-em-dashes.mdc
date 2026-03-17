@@ -1,0 +1,13 @@
+---
+description: Do not use em dashes in site content
+alwaysApply: true
+---
+
+# No Em Dashes
+
+Do not use em dashes (—) anywhere on this site.
+
+Use alternatives instead:
+- Semicolon: "not just X; it is Y"
+- Comma: "not just X, it is Y"
+- Period: "not just X. It is Y"
