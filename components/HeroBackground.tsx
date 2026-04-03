@@ -56,7 +56,7 @@ export default function HeroBackground() {
         aria-hidden
       >
         <div
-          className="h-[50vh] w-full max-w-2xl rounded-full opacity-[0.06] blur-3xl"
+          className="h-[50vh] w-full max-w-2xl rounded-[8px] opacity-[0.06] blur-3xl"
           style={{
             background:
               "radial-gradient(ellipse at center, #6f1309 0%, transparent 70%)",

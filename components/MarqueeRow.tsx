@@ -92,7 +92,7 @@ export default function MarqueeRow({ images, direction }: MarqueeRowProps) {
         {duplicatedImages.map((src, i) => (
           <div
             key={i}
-            className="thumbnail flex-shrink-0 overflow-hidden rounded-lg bg-slate-900/50"
+            className="thumbnail flex-shrink-0 overflow-hidden rounded-[8px] bg-slate-900/50"
           >
             <Image
               src={src}

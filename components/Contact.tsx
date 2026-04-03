@@ -19,7 +19,7 @@ export default function Contact() {
       <div className="section-container contact-section-inner relative z-[1]">
         <div className="contact-grid">
           <div className="contact-copy">
-            <span className="eyebrow contact-eyebrow">WORK TOGETHER</span>
+            <span className="eyebrow contact-kicker">Work together</span>
             <h2 id="contact-heading" className="contact-headline">
               Let&apos;s create a website that feels as strong as your work.
             </h2>

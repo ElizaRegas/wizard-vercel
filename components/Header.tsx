@@ -9,7 +9,8 @@ const NAV_LINKS = [
   { href: "/#about", label: "About" },
   { href: "/#work", label: "Work" },
   { href: "/services", label: "Services" },
-  { href: "#contact", label: "Contact" },
+  { href: "/estimate", label: "Estimator" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Header() {
@@ -57,9 +58,9 @@ export default function Header() {
               href={href}
               className="header-nav-link px-4 py-2 text-[18px] font-medium tracking-[0.03em] text-white/75 transition-colors hover:text-white/95"
               onClick={
-                href === "/services"
+                href === "/services" || href === "/estimate"
                   ? (e) => {
-                      if (pathname === "/services") {
+                      if (pathname === href) {
                         e.preventDefault();
                         window.scrollTo(0, 0);
                       }
@@ -74,8 +75,8 @@ export default function Header() {
 
         <div className="flex flex-shrink-0 items-center">
           <Link
-            href="#contact"
-            className="header-cta inline-flex h-9 items-center justify-center rounded-[12px] px-4 text-[12px] font-medium uppercase tracking-widest text-white transition-all md:h-10 md:px-5"
+            href="/#contact"
+            className="header-cta inline-flex h-9 items-center justify-center rounded-[8px] px-4 text-[12px] font-medium uppercase tracking-widest text-white transition-all md:h-10 md:px-5"
           >
             Start Project
           </Link>

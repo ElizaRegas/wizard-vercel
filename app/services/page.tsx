@@ -24,13 +24,13 @@ export default function ServicesPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
                 <Link
                   href="#contact"
-                  className="cta-primary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[14px] px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
+                  className="cta-primary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[8px] px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
                 >
                   Start Project
                 </Link>
                 <Link
                   href="/#work"
-                  className="cta-secondary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[14px] px-8 py-3.5 text-sm font-medium uppercase transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
+                  className="cta-secondary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[8px] px-8 py-3.5 text-sm font-medium uppercase transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
                 >
                   View Work
                 </Link>
@@ -153,7 +153,7 @@ export default function ServicesPage() {
               </p>
               <Link
                 href="#contact"
-                className="cta-primary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[14px] px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
+                className="cta-primary hero-cta-btn flex min-h-[48px] w-[200px] items-center justify-center rounded-[8px] px-8 py-3.5 text-sm font-medium uppercase shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black/30"
               >
                 Start Project
               </Link>
