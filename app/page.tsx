@@ -1,5 +1,9 @@
 import Hero from "@/components/Hero";
 import About from "@/components/About";
+import SelectedWork from "@/components/SelectedWork";
+import Process from "@/components/Process";
+import StackedServiceCards from "@/components/StackedServiceCards";
+import Contact from "@/components/Contact";
 
 export default function Home() {
     return (
@@ -8,22 +12,14 @@ export default function Home() {
             <div className="section-divider-glass" aria-hidden />
             <About />
             <div className="section-divider-glass" aria-hidden />
-            <section id="projects">
-                <h2>Featured Projects</h2>
-                <p>Selected work will go here.</p>
-            </section>
-
-            <section id="services">
-                <h2>Services</h2>
-                <p>Design, development, and creative technology.</p>
-            </section>
-
+            <SelectedWork />
+            <div className="section-divider-glass" aria-hidden />
+            <Process />
+            <div className="section-divider-glass" aria-hidden />
+            <StackedServiceCards />
             <div className="section-divider-glass" aria-hidden />
 
-            <section id="contact">
-                <h2>Contact</h2>
-                <p>Email, form, or links will go here.</p>
-            </section>
+            <Contact />
         </main>
     );
 }

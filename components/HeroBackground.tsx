@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * HeroBackground — Moving image field behind center content only
+ * HeroBackground - Moving image field behind center content only
  *
  * Layer order (back to front):
  * 1. Image field container (centered band, masked edges)
@@ -36,7 +36,7 @@ export default function HeroBackground() {
         </div>
       </div>
 
-      {/* Dark overlay above image rows — top/bottom quieter, center slightly lighter for panel */}
+      {/* Dark overlay above image rows - top/bottom quieter, center slightly lighter for panel */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{

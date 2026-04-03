@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Wizard Web Development — Premium Hero
+ * Wizard Web Development - Premium Hero
  *
  * Full-width hero with centered content.
  * Scrolling rows span viewport; content constrained to max-w-[900px].
@@ -16,18 +16,12 @@ export default function Hero() {
       className="hero relative flex w-full flex-col overflow-hidden"
       aria-label="Hero"
     >
-      {/* Faint light beam — environmental lighting */}
-      <div className="hero-light-beam" aria-hidden />
-
-      {/* Soft ambient light above panel */}
-      <div className="hero-ambient-top" aria-hidden />
-
       {/* Faint ghost UI elements */}
       <div className="atmosphere-ghost atmosphere-ghost-1" aria-hidden />
       <div className="atmosphere-ghost atmosphere-ghost-2" aria-hidden />
       <div className="atmosphere-ghost atmosphere-ghost-line" aria-hidden />
 
-      {/* Subtle center overlay — thumbnails ~12% dimmer behind panel area */}
+      {/* Subtle center overlay: thumbnails ~12% dimmer behind panel area */}
       <div
         className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center"
         aria-hidden
@@ -53,7 +47,7 @@ export default function Hero() {
               <h1>
                 <span
                   className="inline-block"
-                  style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.45))" }}
+                  style={{ filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.25))" }}
                 >
                   <Image
                     src="/images/heroLogo.png"
@@ -66,7 +60,7 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <p className="hero-tagline max-w-md">
+              <p className="hero-tagline max-w-lg">
                 Modern websites, intuitively designed.
               </p>
 

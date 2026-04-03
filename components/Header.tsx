@@ -2,16 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { href: "#about", label: "About" },
-  { href: "#projects", label: "Work" },
-  { href: "#services", label: "Services" },
+  { href: "/#about", label: "About" },
+  { href: "/#work", label: "Work" },
+  { href: "/services", label: "Services" },
   { href: "#contact", label: "Contact" },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -54,6 +56,16 @@ export default function Header() {
               key={href}
               href={href}
               className="header-nav-link px-4 py-2 text-[18px] font-medium tracking-[0.03em] text-white/75 transition-colors hover:text-white/95"
+              onClick={
+                href === "/services"
+                  ? (e) => {
+                      if (pathname === "/services") {
+                        e.preventDefault();
+                        window.scrollTo(0, 0);
+                      }
+                    }
+                  : undefined
+              }
             >
               {label}
             </Link>

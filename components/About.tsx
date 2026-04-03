@@ -12,24 +12,23 @@ export default function About() {
       {/* Subtle atmospheric glow behind portrait */}
       <div className="about-section-glow" aria-hidden />
 
-      <div className="about-inner relative z-10 mx-auto flex max-w-[1200px] flex-col items-start gap-16 px-6 md:grid md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20 md:px-10">
-        {/* Left column, text content */}
-        <div className="about-content pb-4 md:pb-0">
+      <div className="about-inner section-container relative z-10 flex flex-col items-start gap-16 md:grid md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20">
+        {/* Left column, text content: subtle panel surface */}
+        <div className="about-content about-content-panel pb-4 md:pb-0">
           <Link href="#about" className="about-pill mb-6 inline-block">
             MEET THE WIZARD
           </Link>
-          <h2 className="about-headline mb-10 text-[2.25rem] font-semibold leading-[1.3] tracking-tight text-white md:text-[2.75rem] md:mb-12">
-            Websites designed with intuition, built for performance, and launched
-            for visibility.
+          <h2 className="about-headline mb-10 text-[2.5rem] font-semibold leading-[1.3] tracking-tight text-white md:text-[3rem] md:mb-12">
+            Websites designed with intuition, built for performance.
           </h2>
           <div className="about-body">
-            <p className="max-w-[38ch]">
+            <p className="max-w-[34ch]">
               Wizard Web Development creates modern, high-impact websites for
               brands, creatives, and service-based businesses that want more than
               a template. Every project begins with an intuitive design process
               that translates brand and vision into a clear digital experience.
             </p>
-            <p className="max-w-[38ch]">
+            <p className="max-w-[34ch]">
               From there, the site is built with performance and responsiveness
               at its core, and deployed with a strong SEO foundation so the final
               result is not just beautiful, it is fast, accessible, and easy to find.
@@ -66,7 +65,7 @@ export default function About() {
             <div className="about-portrait-glow" aria-hidden />
             <div className="about-portrait-ring" aria-hidden />
             <div className="about-portrait-stack">
-              {/* Vertical glass spine — restrained depth accent behind right edge */}
+              {/* Vertical glass spine: restrained depth accent behind right edge */}
               <div className="about-portrait-spine" aria-hidden />
               <div className="about-portrait-frame">
                 <div className="about-headshot-inner">
