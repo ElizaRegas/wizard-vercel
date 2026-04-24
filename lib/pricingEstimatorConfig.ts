@@ -14,6 +14,14 @@ export type SectionCategory =
 
 export type SectionBadge = "popular" | "scope_carefully" | "upsell";
 
+export interface PlacementOption {
+  id: string;
+  label: string;
+  price: number;
+  priceMax: number;
+  hours: string;
+}
+
 export interface EstimatorSection {
   id: string;
   name: string;
@@ -33,6 +41,8 @@ export interface EstimatorSection {
   priceUnit?: "per hour" | "per month";
   /** Shown for per-hour upload line: internal cost rate / hr. */
   atCostRatePerHour?: number;
+  /** When set, user picks a placement; price/hours adjust accordingly. */
+  placementOptions?: PlacementOption[];
 }
 
 export const COST_RATE_PER_HOUR = 100;
@@ -91,7 +101,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "hero",
     name: "Hero + header + footer",
     category: "foundation",
-    price: 1000,
+    price: 800,
+    priceMax: 1200,
     required: true,
     description:
       "Nav, branded hero with CTA, footer with links. Mobile responsive.",
@@ -104,19 +115,25 @@ export const SECTIONS: EstimatorSection[] = [
     id: "about",
     name: "About / our story",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description: "Brand story, mission, photo. Client supplies copy.",
     hours: "2–3",
     atCostMin: 200,
     atCostMax: 300,
     marginNote: "Slim now; solid later.",
     badges: ["popular"],
+    placementOptions: [
+      { id: "section", label: "Homepage section", price: 200, priceMax: 300, hours: "2–3" },
+      { id: "page", label: "Dedicated page", price: 400, priceMax: 600, hours: "4–6" },
+    ],
   },
   {
     id: "services",
     name: "Services overview",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description: "Cards or list, up to 6 items. Client supplies copy.",
     hours: "2–3",
     atCostMin: 200,
@@ -126,9 +143,10 @@ export const SECTIONS: EstimatorSection[] = [
   },
   {
     id: "testimonials_static",
-    name: "Testimonials (static)",
+    name: "Testimonials",
     category: "static",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Quote cards, client supplies text.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -137,9 +155,10 @@ export const SECTIONS: EstimatorSection[] = [
   },
   {
     id: "portfolio_static",
-    name: "Portfolio grid (static)",
+    name: "Portfolio grid",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description: "Image grid, no filtering. Client supplies images.",
     hours: "2–3",
     atCostMin: 200,
@@ -150,7 +169,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "team",
     name: "Team / staff bios",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description: "Photo, name, title, bio. Up to 8 people.",
     hours: "2–3",
     atCostMin: 200,
@@ -161,7 +181,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "faq",
     name: "FAQ",
     category: "static",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Accordion or list. Client supplies Q&A.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -172,7 +193,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "pricing_plans",
     name: "Pricing / plans",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description: "2–4 tier comparison cards. Static, no toggle.",
     hours: "2–3",
     atCostMin: 200,
@@ -183,7 +205,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "logo_bar",
     name: "Logo / client trust bar",
     category: "static",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Row of partner logos. Client supplies files.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -194,7 +217,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "stats",
     name: "Stats / numbers",
     category: "static",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Animated counters or large-number display.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -205,7 +229,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "cta_strip",
     name: "CTA / banner strip",
     category: "static",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Mid-page callout with headline and button.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -216,7 +241,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "mission",
     name: "Mission / values",
     category: "static",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Icon + text layout. Client supplies copy.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -227,7 +253,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "awards",
     name: "Awards & certifications",
     category: "static",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Badge/logo display. Client supplies files.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -238,7 +265,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "press",
     name: "Press / as seen in",
     category: "static",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Media logo bar with optional quote pull.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -249,7 +277,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "process",
     name: "Process / how it works",
     category: "static",
-    price: 250,
+    price: 200,
+    priceMax: 250,
     description: "Numbered steps or timeline. Client supplies copy.",
     hours: "2–2.5",
     atCostMin: 200,
@@ -258,9 +287,10 @@ export const SECTIONS: EstimatorSection[] = [
   },
   {
     id: "before_after_static",
-    name: "Before & after (static)",
+    name: "Before & after",
     category: "static",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Side-by-side image comparison layout.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -271,7 +301,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "contact_form",
     name: "Contact form",
     category: "interactive",
-    price: 350,
+    price: 300,
+    priceMax: 400,
     description:
       "Validated fields, spam protection, email delivery, confirmation.",
     hours: "3–4",
@@ -284,7 +315,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "quote_form",
     name: "Multi-step / quote form",
     category: "interactive",
-    price: 600,
+    price: 500,
+    priceMax: 700,
     description: "2–4 step conditional form. More logic, more testing.",
     hours: "5–7",
     atCostMin: 500,
@@ -295,7 +327,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "newsletter",
     name: "Newsletter signup",
     category: "interactive",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     description:
       "Mailchimp/Klaviyo/ConvertKit integration, styled to match.",
     hours: "2–3",
@@ -307,7 +340,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "blog",
     name: "Blog / news",
     category: "interactive",
-    price: 750,
+    price: 600,
+    priceMax: 800,
     description:
       "CMS posts, listing page, single post template, categories, SEO fields.",
     hours: "6–8",
@@ -320,7 +354,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "portfolio_filter",
     name: "Portfolio w/ filtering",
     category: "interactive",
-    price: 500,
+    price: 400,
+    priceMax: 500,
     description: "JS category filter, no page reload.",
     hours: "4–5",
     atCostMin: 400,
@@ -331,7 +366,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "lightbox",
     name: "Photo / video lightbox",
     category: "interactive",
-    price: 400,
+    price: 300,
+    priceMax: 400,
     description: "Clickable gallery with full-size overlay viewer.",
     hours: "3–4",
     atCostMin: 300,
@@ -342,7 +378,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "testimonials_carousel",
     name: "Testimonials carousel",
     category: "interactive",
-    price: 350,
+    price: 250,
+    priceMax: 350,
     description: "Auto-advancing or swipeable slider.",
     hours: "2.5–3.5",
     atCostMin: 250,
@@ -353,7 +390,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "booking",
     name: "Booking / scheduling embed",
     category: "interactive",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Calendly/Acuity styled to match site.",
     hours: "2–3",
     atCostMin: 200,
@@ -365,7 +403,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "map",
     name: "Map / location embed",
     category: "interactive",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Google Maps with custom pin or style.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -376,7 +415,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "chat",
     name: "Live chat / chatbot widget",
     category: "interactive",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Install + configure Tidio, Intercom, etc.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -387,7 +427,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "popup",
     name: "Popup / exit-intent modal",
     category: "interactive",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Triggered overlay with opt-in or offer.",
     hours: "2–3",
     atCostMin: 200,
@@ -398,7 +439,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "video_section",
     name: "Video section / background",
     category: "interactive",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Embedded or background video, muted autoplay.",
     hours: "2–3",
     atCostMin: 200,
@@ -409,7 +451,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "before_after_slider",
     name: "Before & after slider",
     category: "interactive",
-    price: 300,
+    price: 250,
+    priceMax: 300,
     description: "Interactive drag-to-reveal image comparison.",
     hours: "2.5–3",
     atCostMin: 250,
@@ -420,7 +463,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "countdown",
     name: "Countdown timer",
     category: "interactive",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Event or launch countdown. Static date target.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -431,7 +475,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "reviews_widget",
     name: "Google review widget",
     category: "interactive",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Third-party embed (EmbedSocial, etc.) styled to match.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -442,7 +487,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "podcast",
     name: "Podcast embed",
     category: "interactive",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Spotify/Buzzsprout player styled to match.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -453,7 +499,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "events",
     name: "Events listing + single page",
     category: "interactive",
-    price: 600,
+    price: 500,
+    priceMax: 700,
     description:
       "CMS-managed events with date, location, registration link.",
     hours: "5–7",
@@ -465,7 +512,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "event_registration",
     name: "Event registration embed",
     category: "interactive",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Eventbrite or similar styled and embedded.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -476,7 +524,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "search",
     name: "Search results page",
     category: "interactive",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Site search with styled results page.",
     hours: "2–3",
     atCostMin: 200,
@@ -487,7 +536,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "comparison_table",
     name: "Comparison table (dynamic)",
     category: "interactive",
-    price: 400,
+    price: 300,
+    priceMax: 400,
     description: "Interactive pricing or feature comparison.",
     hours: "3–4",
     atCostMin: 300,
@@ -498,7 +548,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "woo_simple",
     name: "WooCommerce, simple shop",
     category: "ecommerce",
-    price: 1200,
+    price: 1000,
+    priceMax: 1400,
     description:
       "≤20 products, single type, Stripe/PayPal, shop + product + cart + checkout.",
     hours: "10–14",
@@ -511,7 +562,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "woo_mid",
     name: "WooCommerce, mid catalog",
     category: "ecommerce",
-    price: 2200,
+    price: 1800,
+    priceMax: 2400,
     description:
       "21–100 products, variable (size/color), category pages, filtering.",
     hours: "18–24",
@@ -524,7 +576,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "shopify",
     name: "Shopify setup",
     category: "ecommerce",
-    price: 1200,
+    price: 1000,
+    priceMax: 1400,
     description: "Theme customization, ≤20 products, payment + shipping rules.",
     hours: "10–14",
     atCostMin: 1000,
@@ -536,7 +589,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "product_import",
     name: "Product import (per 50 items)",
     category: "ecommerce",
-    price: 250,
+    price: 200,
+    priceMax: 200,
     description: "Bulk CSV import. Clean data required.",
     hours: "2/50 items",
     atCostMin: 200,
@@ -547,7 +601,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "customer_account",
     name: "Customer account / login",
     category: "ecommerce",
-    price: 400,
+    price: 300,
+    priceMax: 400,
     description: "WooCommerce my account page, order history.",
     hours: "3–4",
     atCostMin: 300,
@@ -558,7 +613,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "wishlist",
     name: "Wishlist",
     category: "ecommerce",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Plugin-based wishlist functionality.",
     hours: "2–3",
     atCostMin: 200,
@@ -569,7 +625,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "upsell",
     name: "Upsell / cross-sell section",
     category: "ecommerce",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "You may also like or bundle recommendations.",
     hours: "2–3",
     atCostMin: 200,
@@ -580,7 +637,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "inner_page",
     name: "Standard inner page",
     category: "pages",
-    price: 200,
+    price: 150,
+    priceMax: 200,
     description: "Reuses existing design system. Client supplies content.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -591,7 +649,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "landing_page",
     name: "Landing page (unique layout)",
     category: "pages",
-    price: 500,
+    price: 400,
+    priceMax: 600,
     description: "Campaign or product page with its own design.",
     hours: "4–6",
     atCostMin: 400,
@@ -602,7 +661,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "case_study",
     name: "Case study page",
     category: "pages",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Structured long-form project write-up with images.",
     hours: "2–3",
     atCostMin: 200,
@@ -613,7 +673,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "legal_page",
     name: "Legal page (privacy / terms)",
     category: "pages",
-    price: 100,
+    price: 50,
+    priceMax: 100,
     description: "Styled to match site. Client supplies text.",
     hours: "0.5–1",
     atCostMin: 50,
@@ -624,7 +685,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "404",
     name: "404 error page",
     category: "pages",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "Branded, with navigation back to site.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -635,7 +697,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "sitemap_page",
     name: "Sitemap page",
     category: "pages",
-    price: 100,
+    price: 50,
+    priceMax: 100,
     description: "HTML sitemap page for users.",
     hours: "0.5–1",
     atCostMin: 50,
@@ -646,7 +709,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "seo_setup",
     name: "On-page SEO setup",
     category: "seo",
-    price: 350,
+    price: 200,
+    priceMax: 300,
     description: "Meta tags, OG tags, sitemap, robots.txt, Search Console.",
     hours: "2–3",
     atCostMin: 200,
@@ -658,7 +722,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "schema",
     name: "Schema markup",
     category: "seo",
-    price: 250,
+    price: 150,
+    priceMax: 200,
     description: "Local business, reviews, FAQ structured data.",
     hours: "1.5–2",
     atCostMin: 150,
@@ -669,7 +734,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "analytics",
     name: "GA4 + Tag Manager",
     category: "seo",
-    price: 300,
+    price: 200,
+    priceMax: 300,
     description: "Install, goal/event tracking (form submit, button click).",
     hours: "2–3",
     atCostMin: 200,
@@ -681,7 +747,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "speed",
     name: "Speed optimization",
     category: "seo",
-    price: 350,
+    price: 200,
+    priceMax: 400,
     description:
       "Image compression, caching, lazy load, Core Web Vitals fixes.",
     hours: "2–4",
@@ -693,7 +760,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "accessibility",
     name: "Accessibility (WCAG 2.1 AA)",
     category: "seo",
-    price: 500,
+    price: 400,
+    priceMax: 600,
     description:
       "For healthcare, gov, education clients who need compliance.",
     hours: "4–6",
@@ -705,7 +773,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "cookie_banner",
     name: "Cookie consent banner",
     category: "seo",
-    price: 150,
+    price: 100,
+    priceMax: 150,
     description: "GDPR/CCPA compliant plugin configured and styled.",
     hours: "1–1.5",
     atCostMin: 100,
@@ -716,7 +785,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "redirects",
     name: "301 redirects (migration)",
     category: "seo",
-    price: 200,
+    price: 100,
+    priceMax: 300,
     description: "Map old URLs to new. Client supplies list or you audit.",
     hours: "1–3",
     atCostMin: 100,
@@ -727,7 +797,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "hosting_setup",
     name: "Domain + hosting setup",
     category: "launch",
-    price: 150,
+    price: 100,
+    priceMax: 200,
     description: "DNS, SSL, managed WP hosting config. Excludes hosting cost.",
     hours: "1–2",
     atCostMin: 100,
@@ -751,8 +822,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "content_migration",
     name: "Content migration",
     category: "launch",
-    price: 400,
-    priceMax: 700,
+    price: 300,
+    priceMax: 600,
     description: "Porting content from old site to new build.",
     hours: "3–6",
     atCostMin: 300,
@@ -763,7 +834,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "training",
     name: "CMS training session",
     category: "launch",
-    price: 200,
+    price: 150,
+    priceMax: 150,
     description: "1-hour recorded walkthrough so client can self-manage.",
     hours: "1.5",
     atCostMin: 150,
@@ -775,7 +847,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "maintenance_basic",
     name: "Monthly maintenance, basic",
     category: "launch",
-    price: 150,
+    price: 100,
+    priceMax: 200,
     priceUnit: "per month",
     description:
       "Plugin/theme updates, backups, uptime monitoring, 1hr edits.",
@@ -789,7 +862,8 @@ export const SECTIONS: EstimatorSection[] = [
     id: "maintenance_priority",
     name: "Monthly maintenance, priority",
     category: "launch",
-    price: 250,
+    price: 200,
+    priceMax: 300,
     priceUnit: "per month",
     description:
       "Everything in basic + priority response + 2hrs edits.",
@@ -900,7 +974,8 @@ function quotedHigh(section: EstimatorSection): number {
 export function sectionLineAmounts(
   section: EstimatorSection,
   selected: boolean,
-  quantities: EstimatorQuantities
+  quantities: EstimatorQuantities,
+  placements?: Record<string, string>
 ): { low: number; high: number } {
   if (section.required) {
     return { low: section.price, high: quotedHigh(section) };
@@ -908,28 +983,33 @@ export function sectionLineAmounts(
   if (!selected) {
     return { low: 0, high: 0 };
   }
+  const placement = section.placementOptions && placements?.[section.id]
+    ? section.placementOptions.find((p) => p.id === placements[section.id])
+    : undefined;
+  const priceLow = placement?.price ?? section.price;
+  const priceHigh = placement?.priceMax ?? quotedHigh(section);
   if (section.id === "product_import") {
     const b = Math.max(1, quantities.productImportBatches);
     return {
-      low: section.price * b,
-      high: quotedHigh(section) * b,
+      low: priceLow * b,
+      high: priceHigh * b,
     };
   }
   if (section.priceUnit === "per hour") {
     const h = Math.max(1, quantities.contentUploadHours);
     return {
-      low: section.price * h,
-      high: quotedHigh(section) * h,
+      low: priceLow * h,
+      high: priceHigh * h,
     };
   }
   if (section.priceUnit === "per month") {
     const m = Math.max(1, quantities.maintenanceMonths);
     return {
-      low: section.price * m,
-      high: quotedHigh(section) * m,
+      low: priceLow * m,
+      high: priceHigh * m,
     };
   }
-  return { low: section.price, high: quotedHigh(section) };
+  return { low: priceLow, high: priceHigh };
 }
 
 export interface EstimateResult {
@@ -952,6 +1032,7 @@ export function computeEstimate(input: {
   selectedOptionalIds: Set<string> | string[];
   modifierIds: Set<string> | string[];
   quantities?: Partial<EstimatorQuantities>;
+  placements?: Record<string, string>;
 }): EstimateResult {
   const selected = new Set(
     Array.isArray(input.selectedOptionalIds)
@@ -970,7 +1051,7 @@ export function computeEstimate(input: {
   let itemSubtotalHigh = 0;
   for (const section of SECTIONS) {
     const isOn = section.required || selected.has(section.id);
-    const { low, high } = sectionLineAmounts(section, isOn, q);
+    const { low, high } = sectionLineAmounts(section, isOn, q, input.placements);
     itemSubtotalLow += low;
     itemSubtotalHigh += high;
   }

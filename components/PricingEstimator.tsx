@@ -7,7 +7,6 @@ import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
   computeEstimate,
-  ESTIMATOR_README,
   formatSectionBadges,
   MODIFIERS,
   SECTIONS,
@@ -30,20 +29,6 @@ function formatRange(low: number, high: number) {
   return `${currency.format(low)} – ${currency.format(high)}`;
 }
 
-function formatAtCostLabel(s: EstimatorSection) {
-  if (s.id === "product_import") {
-    return `${currency.format(s.atCostMin)}/50 items`;
-  }
-  if (s.atCostRatePerHour != null) {
-    return `${currency.format(s.atCostRatePerHour)}/hr`;
-  }
-  const mo = s.priceUnit === "per month" ? "/mo" : "";
-  if (s.atCostMin === s.atCostMax) {
-    return `${currency.format(s.atCostMin)}${mo}`;
-  }
-  return `${currency.format(s.atCostMin)}–${currency.format(s.atCostMax)}${mo}`;
-}
-
 function formatQuotedLabel(s: EstimatorSection) {
   const unit =
     s.priceUnit === "per hour"
@@ -58,24 +43,31 @@ function formatQuotedLabel(s: EstimatorSection) {
   return `${currency.format(s.price)}–${currency.format(hi)}${unit}`;
 }
 
-function SectionMetrics({ s }: { s: EstimatorSection }) {
+function SectionMetrics({ s, hours, price, priceMax }: {
+  s: EstimatorSection;
+  hours?: string;
+  price?: number;
+  priceMax?: number;
+}) {
+  const h = hours ?? s.hours;
+  const lo = price ?? s.price;
+  const hi = priceMax ?? s.priceMax ?? s.price;
+  const unit =
+    s.priceUnit === "per hour" ? "/hr"
+    : s.priceUnit === "per month" ? "/mo"
+    : "";
+  const costLabel = lo === hi
+    ? `${currency.format(lo)}${unit}`
+    : `${currency.format(lo)}–${currency.format(hi)}${unit}`;
   return (
     <dl className="pricing-estimator-metrics">
       <div className="pricing-estimator-metric">
-        <dt>Hrs</dt>
-        <dd>{s.hours}</dd>
+        <dt>Hours</dt>
+        <dd>{h}</dd>
       </div>
       <div className="pricing-estimator-metric">
-        <dt>At cost</dt>
-        <dd>{formatAtCostLabel(s)}</dd>
-      </div>
-      <div className="pricing-estimator-metric">
-        <dt>Quoted</dt>
-        <dd>{formatQuotedLabel(s)}</dd>
-      </div>
-      <div className="pricing-estimator-metric pricing-estimator-metric--margin">
-        <dt>Margin</dt>
-        <dd>{s.marginNote}</dd>
+        <dt>Estimated Cost</dt>
+        <dd>{costLabel}</dd>
       </div>
     </dl>
   );
@@ -97,8 +89,17 @@ function BadgeList({ s }: { s: EstimatorSection }) {
   );
 }
 
+const PATHS = [
+  { id: "full", label: "Full Website" },
+  { id: "refresh", label: "Website Refresh" },
+  { id: "landing", label: "Landing Pages" },
+] as const;
+
+type PathId = (typeof PATHS)[number]["id"];
+
 export default function PricingEstimator() {
   const baseId = useId();
+  const [activePath, setActivePath] = useState<PathId>("full");
   const [selectedOptional, setSelectedOptional] = useState<Set<string>>(
     () => new Set()
   );
@@ -109,6 +110,7 @@ export default function PricingEstimator() {
   const [contentUploadHours, setContentUploadHours] = useState(2);
   const [maintenanceMonths, setMaintenanceMonths] = useState(1);
   const [revisionHours, setRevisionHours] = useState(2);
+  const [placements, setPlacements] = useState<Record<string, string>>({});
 
   const quantities = useMemo(
     () => ({
@@ -131,8 +133,9 @@ export default function PricingEstimator() {
         selectedOptionalIds: selectedOptional,
         modifierIds,
         quantities,
+        placements,
       }),
-    [selectedOptional, modifierIds, quantities]
+    [selectedOptional, modifierIds, quantities, placements]
   );
 
   const breakdown = useMemo(() => {
@@ -221,16 +224,18 @@ export default function PricingEstimator() {
 
   return (
     <div className="pricing-estimator">
-      <div className="pricing-estimator-readme glass-panel">
-        <h2 className="pricing-estimator-readme-title">How to read this</h2>
-        <dl className="pricing-estimator-readme-list">
-          {ESTIMATOR_README.map(({ term, definition }) => (
-            <div key={term} className="pricing-estimator-readme-row">
-              <dt>{term}</dt>
-              <dd>{definition}</dd>
-            </div>
-          ))}
-        </dl>
+      <div className="pricing-estimator-tabs" role="tablist">
+        {PATHS.map((p) => (
+          <button
+            key={p.id}
+            role="tab"
+            aria-selected={activePath === p.id}
+            className={`pricing-estimator-tab${activePath === p.id ? " pricing-estimator-tab--active" : ""}`}
+            onClick={() => setActivePath(p.id)}
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
       <div className="pricing-estimator-layout">
@@ -285,6 +290,9 @@ export default function PricingEstimator() {
                   {inCat.map((s) => {
                     const checked = selectedOptional.has(s.id);
                     const cbId = `${baseId}-${s.id}`;
+                    const activePlacement = s.placementOptions?.find(
+                      (p) => p.id === (placements[s.id] ?? s.placementOptions?.[0]?.id)
+                    );
                     return (
                       <li key={s.id} className="pricing-estimator-catalog-item">
                         <div className="pricing-estimator-catalog-item-inner">
@@ -292,7 +300,15 @@ export default function PricingEstimator() {
                             id={cbId}
                             type="checkbox"
                             checked={checked}
-                            onChange={() => toggleOptional(s.id)}
+                            onChange={() => {
+                              toggleOptional(s.id);
+                              if (!checked && s.placementOptions && !placements[s.id]) {
+                                setPlacements((prev) => ({
+                                  ...prev,
+                                  [s.id]: s.placementOptions![0].id,
+                                }));
+                              }
+                            }}
                             className="pricing-estimator-checkbox pricing-estimator-checkbox--catalog"
                           />
                           <label
@@ -305,12 +321,44 @@ export default function PricingEstimator() {
                               </span>
                               <BadgeList s={s} />
                             </div>
-                            <SectionMetrics s={s} />
+                            <SectionMetrics
+                              s={s}
+                              hours={activePlacement?.hours}
+                              price={activePlacement?.price}
+                              priceMax={activePlacement?.priceMax}
+                            />
                             <p className="pricing-estimator-catalog-desc">
                               {s.description}
                             </p>
                           </label>
                         </div>
+                        {s.placementOptions && checked ? (
+                          <div className="pricing-estimator-qty pricing-estimator-qty--indent">
+                            <span className="pricing-estimator-placement-label">Placement</span>
+                            <div className="pricing-estimator-placement-options">
+                              {s.placementOptions.map((p) => (
+                                <label key={p.id} className="pricing-estimator-placement-option">
+                                  <input
+                                    type="radio"
+                                    name={`${cbId}-placement`}
+                                    value={p.id}
+                                    checked={(placements[s.id] ?? s.placementOptions![0].id) === p.id}
+                                    onChange={() =>
+                                      setPlacements((prev) => ({ ...prev, [s.id]: p.id }))
+                                    }
+                                    className="pricing-estimator-placement-radio"
+                                  />
+                                  <span className="pricing-estimator-placement-text">
+                                    {p.label}
+                                    <span className="pricing-estimator-placement-price">
+                                      {currency.format(p.price)}–{currency.format(p.priceMax)}
+                                    </span>
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
                         {s.id === "product_import" && checked ? (
                           <div className="pricing-estimator-qty pricing-estimator-qty--indent">
                             <label htmlFor={`${cbId}-batches`}>

@@ -9,7 +9,11 @@ export default function SelectedWork({ variant = "default" }: SelectedWorkProps)
     <section id="work" className="selected-work">
       <div className="section-container">
         <div className="section-header">
-          <span className="eyebrow">SELECTED WORK</span>
+          <div className="work-eyebrow-row">
+            <span className="work-eyebrow-line" aria-hidden />
+            <span className="eyebrow">SELECTED WORK</span>
+            <span className="work-eyebrow-line" aria-hidden />
+          </div>
           <h2>
             {isServices
               ? "Selected work that reflects this process."

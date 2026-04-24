@@ -5,7 +5,11 @@ export default function Process() {
     <section id="process" className="selected-work">
       <div className="section-container">
         <div className="section-header">
-          <span className="eyebrow">PROCESS</span>
+          <div className="work-eyebrow-row">
+            <span className="work-eyebrow-line" aria-hidden />
+            <span className="eyebrow">PROCESS</span>
+            <span className="work-eyebrow-line" aria-hidden />
+          </div>
           <h2>A clear path from idea to launch.</h2>
         </div>
 

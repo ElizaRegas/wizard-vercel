@@ -19,7 +19,10 @@ export default function Contact() {
       <div className="section-container contact-section-inner relative z-[1]">
         <div className="contact-grid">
           <div className="contact-copy">
-            <span className="eyebrow contact-kicker">Work together</span>
+            <div className="about-alt-eyebrow-row">
+              <span className="about-alt-eyebrow-line" aria-hidden />
+              <span className="eyebrow">WORK TOGETHER</span>
+            </div>
             <h2 id="contact-heading" className="contact-headline">
               Let&apos;s create a website that feels as strong as your work.
             </h2>
@@ -27,11 +30,6 @@ export default function Contact() {
               From full website builds to thoughtful refreshes, I help shape
               digital experiences that are clear, elevated, and built to perform.
             </p>
-            <ul className="contact-detail-list" role="list">
-              <li>Based in Georgia, working remotely</li>
-              <li>Websites for brands, creatives, and service businesses</li>
-              <li>Typical response within 1–2 business days</li>
-            </ul>
           </div>
 
           <div className="contact-form-shell">

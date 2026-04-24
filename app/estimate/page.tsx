@@ -13,7 +13,11 @@ export default function EstimatePage() {
       <section className="services-section estimate-section">
         <div className="section-container">
           <header className="section-header estimate-header">
-            <span className="eyebrow">PROJECT ESTIMATOR</span>
+            <div className="work-eyebrow-row">
+              <span className="work-eyebrow-line" aria-hidden />
+              <span className="eyebrow">PROJECT ESTIMATOR</span>
+              <span className="work-eyebrow-line" aria-hidden />
+            </div>
             <h1>Price your project yourself</h1>
             <p>
               Every build starts from the included foundation. Add only the
