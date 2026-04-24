@@ -3,14 +3,16 @@
 import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  ADD_ONS,
+  CATEGORY_INTROS,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
   computeEstimate,
-  LANDING_SCOPES,
-  PAGE_BANDS,
-  PROJECT_TYPES,
-  type LandingScopeId,
-  type PageBandId,
-  type ProjectTypeId,
+  ESTIMATOR_README,
+  formatSectionBadges,
+  MODIFIERS,
+  SECTIONS,
+  type EstimatorModifier,
+  type EstimatorSection,
 } from "@/lib/pricingEstimatorConfig";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -19,211 +21,459 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const MAINTENANCE_IDS = ["maintenance_basic", "maintenance_priority"] as const;
+
 function formatRange(low: number, high: number) {
+  if (low === high) {
+    return currency.format(low);
+  }
   return `${currency.format(low)} – ${currency.format(high)}`;
+}
+
+function formatAtCostLabel(s: EstimatorSection) {
+  if (s.id === "product_import") {
+    return `${currency.format(s.atCostMin)}/50 items`;
+  }
+  if (s.atCostRatePerHour != null) {
+    return `${currency.format(s.atCostRatePerHour)}/hr`;
+  }
+  const mo = s.priceUnit === "per month" ? "/mo" : "";
+  if (s.atCostMin === s.atCostMax) {
+    return `${currency.format(s.atCostMin)}${mo}`;
+  }
+  return `${currency.format(s.atCostMin)}–${currency.format(s.atCostMax)}${mo}`;
+}
+
+function formatQuotedLabel(s: EstimatorSection) {
+  const unit =
+    s.priceUnit === "per hour"
+      ? "/hr"
+      : s.priceUnit === "per month"
+        ? "/mo"
+        : "";
+  const hi = s.priceMax ?? s.price;
+  if (s.price === hi) {
+    return `${currency.format(s.price)}${unit}`;
+  }
+  return `${currency.format(s.price)}–${currency.format(hi)}${unit}`;
+}
+
+function SectionMetrics({ s }: { s: EstimatorSection }) {
+  return (
+    <dl className="pricing-estimator-metrics">
+      <div className="pricing-estimator-metric">
+        <dt>Hrs</dt>
+        <dd>{s.hours}</dd>
+      </div>
+      <div className="pricing-estimator-metric">
+        <dt>At cost</dt>
+        <dd>{formatAtCostLabel(s)}</dd>
+      </div>
+      <div className="pricing-estimator-metric">
+        <dt>Quoted</dt>
+        <dd>{formatQuotedLabel(s)}</dd>
+      </div>
+      <div className="pricing-estimator-metric pricing-estimator-metric--margin">
+        <dt>Margin</dt>
+        <dd>{s.marginNote}</dd>
+      </div>
+    </dl>
+  );
+}
+
+function BadgeList({ s }: { s: EstimatorSection }) {
+  const labels = formatSectionBadges(s.badges);
+  if (!labels.length) {
+    return null;
+  }
+  return (
+    <span className="pricing-estimator-badges">
+      {labels.map((label) => (
+        <span key={label} className="pricing-estimator-badge">
+          {label}
+        </span>
+      ))}
+    </span>
+  );
 }
 
 export default function PricingEstimator() {
   const baseId = useId();
-  const [projectType, setProjectType] = useState<ProjectTypeId>("full");
-  const [pageBand, setPageBand] = useState<PageBandId>("s");
-  const [landingScope, setLandingScope] = useState<LandingScopeId>("single");
-  const [addOnIds, setAddOnIds] = useState<string[]>([]);
-  const [rush, setRush] = useState(false);
+  const [selectedOptional, setSelectedOptional] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [modifierIds, setModifierIds] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [productImportBatches, setProductImportBatches] = useState(1);
+  const [contentUploadHours, setContentUploadHours] = useState(2);
+  const [maintenanceMonths, setMaintenanceMonths] = useState(1);
+  const [revisionHours, setRevisionHours] = useState(2);
+
+  const quantities = useMemo(
+    () => ({
+      productImportBatches,
+      contentUploadHours,
+      maintenanceMonths,
+      revisionHours,
+    }),
+    [
+      productImportBatches,
+      contentUploadHours,
+      maintenanceMonths,
+      revisionHours,
+    ]
+  );
 
   const estimate = useMemo(
     () =>
       computeEstimate({
-        projectType,
-        pageBand,
-        landingScope,
-        addOnIds,
-        rush,
+        selectedOptionalIds: selectedOptional,
+        modifierIds,
+        quantities,
       }),
-    [projectType, pageBand, landingScope, addOnIds, rush]
+    [selectedOptional, modifierIds, quantities]
   );
 
-  function toggleAddOn(id: string) {
-    setAddOnIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+  const breakdown = useMemo(() => {
+    const lines: { label: string; amount: string }[] = [
+      {
+        label: "Line items (quoted)",
+        amount: formatRange(
+          estimate.itemSubtotalLow,
+          estimate.itemSubtotalHigh
+        ),
+      },
+    ];
+    if (estimate.rushAmountLow > 0 || estimate.rushAmountHigh > 0) {
+      lines.push({
+        label: "Rush (on line items)",
+        amount: formatRange(
+          estimate.rushAmountLow,
+          estimate.rushAmountHigh
+        ),
+      });
+    }
+    for (const mod of MODIFIERS) {
+      if (!modifierIds.has(mod.id) || mod.type === "percent") {
+        continue;
+      }
+      if (mod.type === "hourly") {
+        if (estimate.revisionAmount > 0) {
+          lines.push({
+            label: mod.name,
+            amount: currency.format(estimate.revisionAmount),
+          });
+        }
+        continue;
+      }
+      lines.push({
+        label: mod.name,
+        amount: `${currency.format(mod.min)} – ${currency.format(mod.max)}`,
+      });
+    }
+    return lines;
+  }, [
+    estimate.itemSubtotalLow,
+    estimate.itemSubtotalHigh,
+    estimate.rushAmountLow,
+    estimate.rushAmountHigh,
+    estimate.revisionAmount,
+    modifierIds,
+  ]);
+
+  function toggleOptional(id: string) {
+    setSelectedOptional((prev) => {
+      const next = new Set(prev);
+      if (MAINTENANCE_IDS.includes(id as (typeof MAINTENANCE_IDS)[number])) {
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          for (const m of MAINTENANCE_IDS) {
+            next.delete(m);
+          }
+          next.add(id);
+        }
+        return next;
+      }
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   }
+
+  function toggleModifier(id: string) {
+    setModifierIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  const requiredSections = SECTIONS.filter((s) => s.required);
 
   return (
     <div className="pricing-estimator">
+      <div className="pricing-estimator-readme glass-panel">
+        <h2 className="pricing-estimator-readme-title">How to read this</h2>
+        <dl className="pricing-estimator-readme-list">
+          {ESTIMATOR_README.map(({ term, definition }) => (
+            <div key={term} className="pricing-estimator-readme-row">
+              <dt>{term}</dt>
+              <dd>{definition}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
       <div className="pricing-estimator-layout">
         <div className="pricing-estimator-controls">
           <fieldset className="pricing-estimator-fieldset">
-            <legend className="pricing-estimator-legend">Project type</legend>
-            <div className="pricing-estimator-type-grid">
-              {PROJECT_TYPES.map((pt) => {
-                const inputId = `${baseId}-type-${pt.id}`;
-                const selected = projectType === pt.id;
-                return (
-                  <div key={pt.id} className="pricing-estimator-option-wrap">
-                    <input
-                      id={inputId}
-                      type="radio"
-                      name="projectType"
-                      value={pt.id}
-                      checked={selected}
-                      onChange={() => setProjectType(pt.id)}
-                      className="pricing-estimator-sr-input"
-                    />
-                    <label
-                      htmlFor={inputId}
-                      className={
-                        selected
-                          ? "pricing-estimator-option pricing-estimator-option--active"
-                          : "pricing-estimator-option"
-                      }
-                    >
-                      <span className="pricing-estimator-option-title">
-                        {pt.title}
+            <legend className="pricing-estimator-legend">
+              Included in every build
+            </legend>
+            <p className="pricing-estimator-catalog-hint">
+              Required baseline so every quote starts from the same foundation.
+            </p>
+            <ul className="pricing-estimator-included-list" role="list">
+              {requiredSections.map((s) => (
+                <li key={s.id} className="pricing-estimator-included-row">
+                  <span className="pricing-estimator-included-badge">
+                    Required
+                  </span>
+                  <div className="pricing-estimator-included-body">
+                    <div className="pricing-estimator-catalog-title-row">
+                      <span className="pricing-estimator-catalog-name">
+                        {s.name}
                       </span>
-                      <span className="pricing-estimator-option-desc">
-                        {pt.description}
-                      </span>
-                    </label>
+                      <BadgeList s={s} />
+                    </div>
+                    <SectionMetrics s={s} />
+                    <p className="pricing-estimator-catalog-desc">
+                      {s.description}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+                </li>
+              ))}
+            </ul>
           </fieldset>
 
-          {projectType === "landing" ? (
-            <fieldset className="pricing-estimator-fieldset">
-              <legend className="pricing-estimator-legend">Campaign scope</legend>
-              <div className="pricing-estimator-chip-row">
-                {LANDING_SCOPES.map((scope) => {
-                  const chipId = `${baseId}-landing-${scope.id}`;
-                  const on = landingScope === scope.id;
-                  return (
-                    <div key={scope.id}>
-                      <input
-                        id={chipId}
-                        type="radio"
-                        name="landingScope"
-                        value={scope.id}
-                        checked={on}
-                        onChange={() => setLandingScope(scope.id)}
-                        className="pricing-estimator-sr-input"
-                      />
-                      <label
-                        htmlFor={chipId}
-                        className={
-                          on
-                            ? "pricing-estimator-chip pricing-estimator-chip--active"
-                            : "pricing-estimator-chip"
-                        }
-                      >
-                        <span className="pricing-estimator-chip-label">
-                          {scope.label}
-                        </span>
-                        <span className="pricing-estimator-chip-hint">
-                          {scope.hint}
-                        </span>
-                      </label>
-                    </div>
-                  );
-                })}
-              </div>
-            </fieldset>
-          ) : (
-            <fieldset className="pricing-estimator-fieldset">
-              <legend className="pricing-estimator-legend">
-                Size of the site
-              </legend>
-              <div className="pricing-estimator-chip-row pricing-estimator-chip-row--wrap">
-                {PAGE_BANDS.map((band) => {
-                  const chipId = `${baseId}-pages-${band.id}`;
-                  const on = pageBand === band.id;
-                  return (
-                    <div key={band.id}>
-                      <input
-                        id={chipId}
-                        type="radio"
-                        name="pageBand"
-                        value={band.id}
-                        checked={on}
-                        onChange={() => setPageBand(band.id)}
-                        className="pricing-estimator-sr-input"
-                      />
-                      <label
-                        htmlFor={chipId}
-                        className={
-                          on
-                            ? "pricing-estimator-chip pricing-estimator-chip--active"
-                            : "pricing-estimator-chip"
-                        }
-                      >
-                        <span className="pricing-estimator-chip-label">
-                          {band.label}
-                        </span>
-                        <span className="pricing-estimator-chip-hint">
-                          {band.hint}
-                        </span>
-                      </label>
-                    </div>
-                  );
-                })}
-              </div>
-            </fieldset>
-          )}
+          {CATEGORY_ORDER.map((category) => {
+            const inCat = SECTIONS.filter(
+              (s) => s.category === category && !s.required
+            );
+            if (inCat.length === 0) {
+              return null;
+            }
+            const intro = CATEGORY_INTROS[category];
+            return (
+              <fieldset key={category} className="pricing-estimator-fieldset">
+                <legend className="pricing-estimator-legend">
+                  {CATEGORY_LABELS[category]}
+                </legend>
+                {intro ? (
+                  <p className="pricing-estimator-category-intro">{intro}</p>
+                ) : null}
+                <ul className="pricing-estimator-catalog" role="list">
+                  {inCat.map((s) => {
+                    const checked = selectedOptional.has(s.id);
+                    const cbId = `${baseId}-${s.id}`;
+                    return (
+                      <li key={s.id} className="pricing-estimator-catalog-item">
+                        <div className="pricing-estimator-catalog-item-inner">
+                          <input
+                            id={cbId}
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleOptional(s.id)}
+                            className="pricing-estimator-checkbox pricing-estimator-checkbox--catalog"
+                          />
+                          <label
+                            htmlFor={cbId}
+                            className="pricing-estimator-catalog-block"
+                          >
+                            <div className="pricing-estimator-catalog-title-row">
+                              <span className="pricing-estimator-catalog-name">
+                                {s.name}
+                              </span>
+                              <BadgeList s={s} />
+                            </div>
+                            <SectionMetrics s={s} />
+                            <p className="pricing-estimator-catalog-desc">
+                              {s.description}
+                            </p>
+                          </label>
+                        </div>
+                        {s.id === "product_import" && checked ? (
+                          <div className="pricing-estimator-qty pricing-estimator-qty--indent">
+                            <label htmlFor={`${cbId}-batches`}>
+                              Batches (50 items each)
+                            </label>
+                            <input
+                              id={`${cbId}-batches`}
+                              type="number"
+                              min={1}
+                              max={99}
+                              value={productImportBatches}
+                              onChange={(e) =>
+                                setProductImportBatches(
+                                  Math.max(
+                                    1,
+                                    Math.min(
+                                      99,
+                                      Number(e.target.value) || 1
+                                    )
+                                  )
+                                )
+                              }
+                              className="pricing-estimator-qty-input"
+                            />
+                          </div>
+                        ) : null}
+                        {s.id === "content_upload" && checked ? (
+                          <div className="pricing-estimator-qty pricing-estimator-qty--indent">
+                            <label htmlFor={`${cbId}-hours`}>
+                              Quoted hours (upload time)
+                            </label>
+                            <input
+                              id={`${cbId}-hours`}
+                              type="number"
+                              min={1}
+                              max={80}
+                              value={contentUploadHours}
+                              onChange={(e) =>
+                                setContentUploadHours(
+                                  Math.max(
+                                    1,
+                                    Math.min(
+                                      80,
+                                      Number(e.target.value) || 1
+                                    )
+                                  )
+                                )
+                              }
+                              className="pricing-estimator-qty-input"
+                            />
+                          </div>
+                        ) : null}
+                        {s.priceUnit === "per month" &&
+                        checked &&
+                        MAINTENANCE_IDS.includes(
+                          s.id as (typeof MAINTENANCE_IDS)[number]
+                        ) ? (
+                          <div className="pricing-estimator-qty pricing-estimator-qty--indent">
+                            <label htmlFor={`${cbId}-months`}>
+                              Months in this estimate
+                            </label>
+                            <input
+                              id={`${cbId}-months`}
+                              type="number"
+                              min={1}
+                              max={24}
+                              value={maintenanceMonths}
+                              onChange={(e) =>
+                                setMaintenanceMonths(
+                                  Math.max(
+                                    1,
+                                    Math.min(
+                                      24,
+                                      Number(e.target.value) || 1
+                                    )
+                                  )
+                                )
+                              }
+                              className="pricing-estimator-qty-input"
+                            />
+                          </div>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </fieldset>
+            );
+          })}
 
           <fieldset className="pricing-estimator-fieldset">
-            <legend className="pricing-estimator-legend">Add-ons</legend>
-            <p className="pricing-estimator-hint-line">
-              Optional. Each item nudges the range based on typical effort.
+            <legend className="pricing-estimator-legend">
+              Price modifiers
+            </legend>
+            <p className="pricing-estimator-catalog-hint">
+              Stack these on top of your line items when they apply.
             </p>
-            <ul className="pricing-estimator-addons">
-              {ADD_ONS.map((a) => {
-                const checked = addOnIds.includes(a.id);
-                const cbId = `${baseId}-addon-${a.id}`;
+            <ul className="pricing-estimator-modifiers" role="list">
+              {MODIFIERS.map((mod) => {
+                const mid = `${baseId}-mod-${mod.id}`;
+                const checked = modifierIds.has(mod.id);
                 return (
-                  <li key={a.id}>
-                    <label className="pricing-estimator-checkbox-row">
-                      <input
-                        id={cbId}
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleAddOn(a.id)}
-                        className="pricing-estimator-checkbox"
-                      />
-                      <span className="pricing-estimator-checkbox-body">
-                        <span className="pricing-estimator-checkbox-label">
-                          {a.label}
-                        </span>
-                        <span className="pricing-estimator-checkbox-blurb">
-                          {a.blurb}
-                        </span>
-                      </span>
-                    </label>
+                  <li key={mod.id}>
+                    <div
+                      className={
+                        mod.type === "hourly"
+                          ? "pricing-estimator-modifier-wrap"
+                          : undefined
+                      }
+                    >
+                      <label className="pricing-estimator-modifier-row">
+                        <input
+                          id={mid}
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleModifier(mod.id)}
+                          className="pricing-estimator-checkbox"
+                        />
+                        <div className="pricing-estimator-modifier-body">
+                          <div className="pricing-estimator-modifier-top">
+                            <span className="pricing-estimator-modifier-name">
+                              {mod.name}
+                            </span>
+                            <span className="pricing-estimator-modifier-tag">
+                              {modifierTag(mod)}
+                            </span>
+                          </div>
+                          <span className="pricing-estimator-modifier-desc">
+                            {mod.description}
+                          </span>
+                        </div>
+                      </label>
+                      {mod.type === "hourly" && checked ? (
+                        <div className="pricing-estimator-qty pricing-estimator-qty--modifier">
+                          <label htmlFor={`${mid}-rev-hrs`}>
+                            Extra revision hours
+                          </label>
+                          <input
+                            id={`${mid}-rev-hrs`}
+                            type="number"
+                            min={0}
+                            max={200}
+                            value={revisionHours}
+                            onChange={(e) =>
+                              setRevisionHours(
+                                Math.max(
+                                  0,
+                                  Math.min(
+                                    200,
+                                    Number(e.target.value) || 0
+                                  )
+                                )
+                              )
+                            }
+                            className="pricing-estimator-qty-input"
+                          />
+                        </div>
+                      ) : null}
+                    </div>
                   </li>
                 );
               })}
             </ul>
-          </fieldset>
-
-          <fieldset className="pricing-estimator-fieldset">
-            <legend className="pricing-estimator-legend">Timeline</legend>
-            <label className="pricing-estimator-rush">
-              <input
-                type="checkbox"
-                checked={rush}
-                onChange={(e) => setRush(e.target.checked)}
-                className="pricing-estimator-checkbox"
-              />
-              <span className="pricing-estimator-rush-copy">
-                <span className="pricing-estimator-checkbox-label">
-                  Rush or fixed deadline
-                </span>
-                <span className="pricing-estimator-checkbox-blurb">
-                  Tighter scheduling typically adds about 15% to cover focused
-                  turnaround.
-                </span>
-              </span>
-            </label>
           </fieldset>
         </div>
 
@@ -234,6 +484,19 @@ export default function PricingEstimator() {
           <p className="pricing-estimator-summary-eyebrow">Estimated range</p>
           <p className="pricing-estimator-summary-range">
             {formatRange(estimate.low, estimate.high)}
+          </p>
+          <ul className="pricing-estimator-summary-lines" role="list">
+            {breakdown.map((row) => (
+              <li key={row.label} className="pricing-estimator-summary-line">
+                <span>{row.label}</span>
+                <span>{row.amount}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="pricing-estimator-summary-note">
+            Rush applies to the line-item subtotal only. Flat modifiers widen
+            the range. Revision hours bill at $100/hr when enabled. Maintenance
+            uses the month count you set for this estimate.
           </p>
           <p className="pricing-estimator-summary-disclaimer">
             This is a self-serve guide, not a binding quote. Every project is
@@ -249,4 +512,14 @@ export default function PricingEstimator() {
       </div>
     </div>
   );
+}
+
+function modifierTag(mod: EstimatorModifier) {
+  if (mod.type === "percent") {
+    return `+${Math.round(mod.value * 100)}% on subtotal`;
+  }
+  if (mod.type === "flat_range") {
+    return `+${currency.format(mod.min)} – ${currency.format(mod.max)}`;
+  }
+  return `${currency.format(mod.rate)}/hr`;
 }

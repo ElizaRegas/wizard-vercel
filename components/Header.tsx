@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 const NAV_LINKS = [
   { href: "/#about", label: "About" },
   { href: "/#work", label: "Work" },
-  { href: "/services", label: "Services" },
+  { href: "/#process", label: "Services" },
   { href: "/estimate", label: "Estimator" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -57,16 +57,20 @@ export default function Header() {
               key={href}
               href={href}
               className="header-nav-link px-4 py-2 text-[18px] font-medium tracking-[0.03em] text-white/75 transition-colors hover:text-white/95"
-              onClick={
-                href === "/services" || href === "/estimate"
-                  ? (e) => {
-                      if (pathname === href) {
-                        e.preventDefault();
-                        window.scrollTo(0, 0);
-                      }
-                    }
-                  : undefined
-              }
+              onClick={(e) => {
+                if (href === "/estimate" && pathname === href) {
+                  e.preventDefault();
+                  window.scrollTo(0, 0);
+                  return;
+                }
+                if (href === "/#process" && pathname === "/") {
+                  e.preventDefault();
+                  document.getElementById("process")?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
             >
               {label}
             </Link>

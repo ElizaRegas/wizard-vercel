@@ -16,9 +16,9 @@ export default function EstimatePage() {
             <span className="eyebrow">PROJECT ESTIMATOR</span>
             <h1>Price your project yourself</h1>
             <p>
-              Choose the options that best match what you have in mind. The
-              range updates instantly and reflects typical engagements; your
-              final proposal may land above or below depending on discovery.
+              Every build starts from the included foundation. Add only the
+              sections and modifiers you need; totals update as you go. Numbers
+              are a guide until we scope the work together.
             </p>
           </header>
           <PricingEstimator />
